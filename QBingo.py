@@ -8,24 +8,27 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__()
         self.initUI()
-        thread = threading.Thread(target=self.run)
-        thread.start()
+        #thread = threading.Thread(target=self.run)
+        #thread.start()
 
     def initUI(self):
         self.scene = QGraphicsScene()
-        self.view = QGraphicsView()
-        self.view.setScene(self.scene)
-        self.resize(1000,500)
-        layout = QHBoxLayout()
+        self.view = QGraphicsView(self)
+
+        layout = QVBoxLayout()
         layout.addWidget(self.view)
         self.setLayout(layout)
+        self.resize(1000,500)
 
     def paintEvent(self, event):
-        self.painter = QPainter(self)
-        self.painter.setPen(Qt.red)
-        self.setFont(QFont('Times',30))
-        self.painter.drawText(250,5*self.counter,str(self.counter))
-        self.painter.end()
+        pass
+        #painter = QPainter(self)
+        #painter.begin(self)
+        #painter.setPen(Qt.red)
+        #painter.setFont(QFont('Times',30))
+        #painter.drawText(250,250,50)
+        #painter.drawText(250,5*self.counter,str(self.counter))
+        #painter.end()
 
     def run(self):
         self.counter = 0
