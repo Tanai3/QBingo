@@ -5,14 +5,17 @@ Sceneだけはself外すな！
 memory leak 
 """
 
+import os
 import sys
 import time
 import random
 import threading
-from ui_bingo import Ui_MainWindow
+#from ui_bingo import Ui_MainWindow
+from QBingoUI import Ui_MainWindow
 from PySide2.QtWidgets import * 
 from PySide2.QtGui import *
 
+# pixmap.height
 FRAMESIZE = 500
 OBJECTSNUM = 5
 
@@ -41,7 +44,7 @@ class MovingItem():
 
     def releaseNumber(self):
         if self.y > FRAMESIZE:
-            print("release")
+            #print("release")
             self.y = 0
             self.sendTeams()
             #self.setNumber(0)
@@ -55,7 +58,9 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.progressBar.setProperty("value", 50)
+        #self.ui.progressBar.setProperty("value", 50)
+        self.resize(1920,1200)
+        self.move(0,0)
         self.scene = QGraphicsScene()
 
         self.counter = 0
@@ -92,14 +97,16 @@ class MainWindow(QMainWindow):
                 self.movingItemList[i].move()
                 self.movingItemList[i].releaseNumber()
             if self.counter > 500:
-                print("break")
+                print("bingo stop")
                 break
 
     def paintEvent(self, event):
         self.paint()
 
 if __name__ == "__main__":
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     app = QApplication(sys.argv)
     window = MainWindow()
+    window.setWindowFlags(Qt.CustomizeWindowHint)
     window.show()
     sys.exit(app.exec_())
