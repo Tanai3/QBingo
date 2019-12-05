@@ -16,7 +16,7 @@ from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 
 # pixmap.height
-FRAMESIZE = 500
+FRAMESIZE = 1200
 OBJECTSNUM = 5
 
 class MovingItem():
@@ -44,10 +44,8 @@ class MovingItem():
 
     def releaseNumber(self):
         if self.y > FRAMESIZE:
-            #print("release")
             self.y = 0
             self.sendTeams()
-            #self.setNumber(0)
     
     def sendTeams(self):
         # sendTeams
@@ -58,8 +56,8 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        #self.ui.progressBar.setProperty("value", 50)
-        self.resize(1920,1200)
+        self.lock = threading.Lock()
+        self.resize(1900,1200)
         self.move(0,0)
         self.scene = QGraphicsScene()
 
@@ -71,8 +69,6 @@ class MainWindow(QMainWindow):
             self.movingItem.initXY(250,100*i)
             self.movingItem.initDXDY(0,5)
             self.movingItemList.append(self.movingItem)
-        thread = threading.Thread(target=self.run)
-        thread.start()
         
     def paint(self):
         self.scene.clear()
@@ -81,14 +77,17 @@ class MainWindow(QMainWindow):
         painter.begin(pixmap)
         painter.setPen(QColor(255.255,0,150))
         painter.setFont(QFont('Times', 50))
-        for i in range(OBJECTSNUM):
-            painter.drawText(self.movingItemList[i].x, self.movingItemList[i].y, self.movingItemList[i].number)
+        if self.lock.locked():
+            for i in range(OBJECTSNUM):
+                painter.drawText(self.movingItemList[i].x, self.movingItemList[i].y, self.movingItemList[i].number)
+                # ヒストリリストからヒストリを表示するコードを書く
         painter.end()
         item = QGraphicsPixmapItem(pixmap)
         self.scene.addItem(item)
         self.ui.graphicsView.setScene(self.scene)
 
     def run(self):
+        self.counter = 0
         while(True):
             self.counter += 1
             time.sleep(1/30)
@@ -98,10 +97,23 @@ class MainWindow(QMainWindow):
                 self.movingItemList[i].releaseNumber()
             if self.counter > 500:
                 print("bingo stop")
+                self.lock.release()
                 break
+                # ここに演出とヒストリリストへ数値登録を入れる
+
 
     def paintEvent(self, event):
         self.paint()
+
+    def mousePressEvent(self, event):
+        print("clicked")
+        if self.lock.locked():
+            # スレッド停止用の命令を入れる
+            return
+        thread = threading.Thread(target=self.run)
+        thread.start()
+        self.lock.acquire()
+        
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
