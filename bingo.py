@@ -134,19 +134,22 @@ class MainWindow(QMainWindow):
             self.counter += 1
             time.sleep(1/60)
             self.update()
+            dx = int(random.random() * 20) + 1
             for i in range(OBJECTSNUM):
                 self.movingItemList[i].move()
+                self.movingItemList[i].initDXDY(0,dx)
                 #self.movingItemList[i].loopNumber()
                 if self.movingItemList[i].y > FRAMESIZE:
                     self.queueItemList.append(self.movingItemList[i].number)
                     self.movingItemList[i].y = 0
                     self.movingItemList[i].setNumber(self.queueItemList.pop(0))
 
-
             if self.counter > 500:
                 self.lock.release()
-                #self.historyItemList.append(bingo_num)
-                self.historyItemList.append(MovingItem(bingo_num))
+                for i in range(len(self.movingItemList)):
+                    print(self.movingItemList[i].number)
+                print("history+"+str(self.movingItemList[5].number))
+                self.historyItemList.append(MovingItem(self.movingItemList[5].number))
                 break
                 # ここに演出入れる
 
